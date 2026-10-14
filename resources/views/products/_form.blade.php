@@ -28,6 +28,11 @@
 			<x-text-input id="stock" name="stock" type="number" min="0" class="mt-1 block w-full" :value="old('stock', $product->stock ?? 0)" required />
 			<x-input-error class="mt-2" :messages="$errors->get('stock')" />
 		</div>
+		<div>
+			<x-input-label for="precio" value="Precio de venta" />
+			<x-text-input id="precio" name="precio" type="number" min="0" step="0.01" class="mt-1 block w-full" :value="old('precio', $product->precio)" required />
+			<x-input-error class="mt-2" :messages="$errors->get('precio')" />
+		</div>
 	</div>
 
 	<div class="grid gap-4 sm:grid-cols-2">

@@ -1,11 +1,12 @@
 <?php
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CompraController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProveedorController;
-use App\Http\Controllers\VentaController;
+use App\Http\Controllers\SaleController;
 use Illuminate\Support\Facades\Route;
 Route::view('/', 'welcome')->name('welcome');
 Route::get('/dashboard', DashboardController::class)
@@ -21,9 +22,7 @@ Route::middleware('auth')->group(function () {
  Route::resource('proveedores', ProveedorController::class)
  ->parameters(['proveedores' => 'proveedor'])
  ->except('show');
- Route::resource('ventas', VentaController::class)
- ->only(['index', 'create', 'store', 'destroy']);
- Route::patch('ventas/{venta}/pagar', [VentaController::class, 'pagar'])->name('ventas.pagar');
+ Route::get('/ventas', fn () => redirect()->route('sales.index'))->name('ventas.index');
  Route::resource('compras', CompraController::class)
  ->only(['index', 'create', 'store', 'destroy']);
  Route::patch('compras/{compra}/recibir', [CompraController::class, 'recibir'])->name('compras.recibir');
@@ -35,5 +34,11 @@ Route::middleware('auth')->group(function () {
  ->withTrashed()
  ->name('categories.restore');
  Route::resource('categories', CategoryController::class)->except('show');
+ Route::patch('clients/{client}/restore', [ClientController::class, 'restore'])
+ ->withTrashed()
+ ->name('clients.restore');
+ Route::resource('clients', ClientController::class)->except('show');
+ Route::resource('sales', SaleController::class)
+ ->only(['index', 'create', 'store', 'show', 'destroy']);
 });
 require __DIR__.'/auth.php';

@@ -22,13 +22,17 @@ class DatabaseSeeder extends Seeder
         ]);
         $user->assignRole('admin');
 
-        // Orden importa: Proveedor y Categoria primero, luego Producto, y al final Venta y Compra
+        // Ordena los datos base antes de crear ventas vinculadas.
         $this->call([
             ProveedorSeeder::class,
             CategoriaSeeder::class,
-            ProductoSeeder::class,
+            ProductSeeder::class,
             VentaSeeder::class,
             CompraSeeder::class,
+            RolePermissionSeeder::class,
+            ClientSeeder::class,
+            TestUserSeeder::class,
+            SaleSeeder::class,
         ]);
     }
 }

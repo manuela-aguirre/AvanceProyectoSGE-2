@@ -1,5 +1,5 @@
 <nav class="border-b border-slate-200 bg-white shadow-sm">
-    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:flex-nowrap sm:px-6 lg:px-8">
         <div class="flex items-center gap-4">
             <a href="{{ route('dashboard') }}" class="flex h-9 w-9 items-center justify-center rounded-md text-[#14532d]" aria-label="Dashboard">
                 @if (file_exists(public_path('build/images/logo-cotecnova.png')))
@@ -25,6 +25,16 @@
                         Categorías
                     </x-nav-link>
                 @endcan
+                @can('ver-clientes')
+                    <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
+                        Clientes
+                    </x-nav-link>
+                @endcan
+                @can('ver-ventas')
+                    <x-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
+                        Ventas
+                    </x-nav-link>
+                @endcan
             </div>
         </div>
 
@@ -47,5 +57,23 @@
                 </form>
             </div>
         @endauth
+
+        <div class="w-full border-t border-slate-100 pt-2 sm:hidden">
+            @can('ver-categorias')
+                <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
+                    Categorías
+                </x-responsive-nav-link>
+            @endcan
+            @can('ver-clientes')
+                <x-responsive-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
+                    Clientes
+                </x-responsive-nav-link>
+            @endcan
+            @can('ver-ventas')
+                <x-responsive-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
+                    Ventas
+                </x-responsive-nav-link>
+            @endcan
+        </div>
     </div>
 </nav>

@@ -27,7 +27,6 @@ class CompraController extends Controller
     public function create()
     {
         return view('compras.create', [
-            // Los de menor stock primero: lo que más urge reponer
             'productos' => Product::with('proveedor')->orderBy('stock')->orderBy('nombre')->get(),
         ]);
     }
@@ -53,7 +52,6 @@ class CompraController extends Controller
             ]);
             $compra->update(['codigo' => sprintf('COM-%04d', $compra->id)]);
 
-            // Solo una compra recibida suma al inventario
             if ($recibida) {
                 $producto->increment('stock', $data['cantidad']);
             }
@@ -70,7 +68,8 @@ class CompraController extends Controller
         }
 
         DB::transaction(function () use ($compra) {
-            $compra->producto()->increment('stock', $compra->cantidad);
+            $producto = Product::lockForUpdate()->findOrFail($compra->producto_id);
+            $producto->increment('stock', $compra->cantidad);
             $compra->update([
                 'estado' => 'recibida',
                 'fecha_recepcion' => now()->toDateString(),

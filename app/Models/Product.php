@@ -12,8 +12,15 @@ class Product extends Model
     protected $table = 'productos';
 
     protected $fillable = [
-        'nombre', 'descripcion', 'imagen_url', 'stock', 'codigo', 'proveedor_id', 'categoria_id',
+        'nombre', 'descripcion', 'imagen_url', 'stock', 'precio', 'codigo', 'proveedor_id', 'categoria_id',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'precio' => 'decimal:2',
+        ];
+    }
 
     // Relación: Producto pertenece a una Proveedor
     public function proveedor()
@@ -33,6 +40,11 @@ class Product extends Model
         $relacion->withTrashed();
 
         return $relacion;
+    }
+
+    public function saleDetails()
+    {
+        return $this->hasMany(SaleDetail::class);
     }
 
     /**

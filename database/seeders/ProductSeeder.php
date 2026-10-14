@@ -6,8 +6,10 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Proveedor;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-class ProductoSeeder extends Seeder
+class ProductSeeder extends Seeder
 {
     public function run(): void
     {
@@ -30,15 +32,47 @@ class ProductoSeeder extends Seeder
             ['nombre' => 'Audífonos con micrófono', 'descripcion' => 'Diadema, conexión 3.5 mm', 'stock' => 9, 'codigo' => 'PRD-0013', 'proveedor' => 'Distribuidora Andina', 'categoria' => 'Accesorios'],
         ];
 
-        foreach ($productos as $producto) {
-            Product::create([
-                'nombre' => $producto['nombre'],
-                'descripcion' => $producto['descripcion'],
-                'stock' => $producto['stock'],
-                'codigo' => $producto['codigo'],
-                'proveedor_id' => $proveedores[$producto['proveedor']],
-                'categoria_id' => $categorias[$producto['categoria']],
-            ]);
-        }
+        DB::transaction(function () use ($productos, $proveedores, $categorias) {
+            foreach ($productos as $producto) {
+                $coincidentes = Product::withTrashed()
+                    ->where('codigo', $producto['codigo'])
+                    ->orderBy('id')
+                    ->get();
+
+                $principal = $coincidentes->first(fn (Product $item) => ! $item->trashed())
+                    ?? $coincidentes->first();
+
+                $datos = [
+                    'nombre' => $producto['nombre'],
+                    'descripcion' => $producto['descripcion'],
+                    'precio' => random_int(5000, 500000),
+                    'codigo' => $producto['codigo'],
+                    'proveedor_id' => $proveedores[$producto['proveedor']],
+                    'categoria_id' => $categorias[$producto['categoria']],
+                ];
+
+                if (! $principal) {
+                    Product::create($datos + [
+                        'stock' => $producto['stock'],
+                    ]);
+
+                    continue;
+                }
+
+                foreach ($coincidentes->where('id', '!=', $principal->id) as $duplicado) {
+                    foreach (['compras' => 'producto_id', 'ventas' => 'producto_id', 'sale_details' => 'product_id'] as $tabla => $columna) {
+                        if (Schema::hasTable($tabla)) {
+                            DB::table($tabla)
+                                ->where($columna, $duplicado->id)
+                                ->update([$columna => $principal->id]);
+                        }
+                    }
+
+                    $duplicado->forceDelete();
+                }
+
+                $principal->update($datos);
+            }
+        });
     }
 }

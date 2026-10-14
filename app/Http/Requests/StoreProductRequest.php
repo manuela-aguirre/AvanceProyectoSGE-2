@@ -15,6 +15,7 @@ class StoreProductRequest extends FormRequest
  'descripcion' => ['nullable', 'string'],
  'imagen_url' => ['nullable', 'url', 'max:255'],
  'stock' => ['required', 'integer', 'min:0'],
+ 'precio' => ['required', 'numeric', 'min:0', 'max:9999999999.99'],
  'codigo' => ['nullable', 'string', 'max:20'],
  'proveedor_id' => ['required', 'exists:proveedores,id'],
  'categoria_id' => ['required', 'exists:categorias,id'],
@@ -26,6 +27,7 @@ class StoreProductRequest extends FormRequest
  'nombre' => 'nombre',
  'descripcion' => 'descripción',
  'imagen_url' => 'imagen',
+ 'precio' => 'precio',
  'proveedor_id' => 'proveedor',
  'categoria_id' => 'categoría',
  ];
