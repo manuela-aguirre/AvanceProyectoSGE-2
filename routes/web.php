@@ -1,14 +1,14 @@
 <?php
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ClientController;
-use App\Http\Controllers\CompraController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProveedorController;
+use App\Http\Controllers\ProviderController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SaleController;
 use Illuminate\Support\Facades\Route;
-Route::view('/', 'welcome')->name('welcome');
+Route::get('/', fn () => redirect('/login'));
 Route::get('/dashboard', DashboardController::class)
  ->middleware(['auth', 'verified'])
  ->name('dashboard');
@@ -16,29 +16,30 @@ Route::middleware('auth')->group(function () {
  Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
  Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
  Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
- Route::get('/usuarios', [DashboardController::class, 'usuarios'])
- ->middleware('verified')
- ->name('usuarios.index');
- Route::resource('proveedores', ProveedorController::class)
- ->parameters(['proveedores' => 'proveedor'])
- ->except('show');
- Route::get('/ventas', fn () => redirect()->route('sales.index'))->name('ventas.index');
- Route::resource('compras', CompraController::class)
- ->only(['index', 'create', 'store', 'destroy']);
- Route::patch('compras/{compra}/recibir', [CompraController::class, 'recibir'])->name('compras.recibir');
+ // Productos
  Route::patch('products/{product}/restore', [ProductController::class, 'restore'])
- ->withTrashed()
- ->name('products.restore');
+ ->withTrashed()->name('products.restore');
  Route::resource('products', ProductController::class)->except('show');
+ // Categorías
  Route::patch('categories/{category}/restore', [CategoryController::class, 'restore'])
- ->withTrashed()
- ->name('categories.restore');
+ ->withTrashed()->name('categories.restore');
  Route::resource('categories', CategoryController::class)->except('show');
+ // Clientes
  Route::patch('clients/{client}/restore', [ClientController::class, 'restore'])
- ->withTrashed()
- ->name('clients.restore');
+ ->withTrashed()->name('clients.restore');
  Route::resource('clients', ClientController::class)->except('show');
- Route::resource('sales', SaleController::class)
- ->only(['index', 'create', 'store', 'show', 'destroy']);
+ // Ventas
+ Route::get('sales/{sale}/pdf', [SaleController::class, 'pdf'])->name('sales.pdf');
+ Route::resource('sales', SaleController::class)->only(['index', 'create', 'store', 'show',
+'destroy']);
+ // Proveedores (Clase 10)
+ Route::patch('providers/{provider}/restore', [ProviderController::class, 'restore'])
+ ->withTrashed()->name('providers.restore');
+ Route::resource('providers', ProviderController::class)->except('show');
+ // Compras (Clase 10)
+ Route::patch('purchases/{purchase}/receive', [PurchaseController::class, 'receive'])->name('purchases.receive');
+ Route::get('purchases/{purchase}/pdf', [PurchaseController::class, 'pdf'])->name('purchases.pdf');
+ Route::resource('purchases', PurchaseController::class)->only(['index', 'create', 'store', 'show',
+'destroy']);
 });
 require __DIR__.'/auth.php';

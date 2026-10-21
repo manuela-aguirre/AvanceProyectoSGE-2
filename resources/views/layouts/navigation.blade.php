@@ -34,6 +34,17 @@
                     <x-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
                         Ventas
                     </x-nav-link>
+                    @can('ver-proveedores')
+ <x-nav-link :href="route('providers.index')" :active="request()->routeIs('providers.*')">
+ Proveedores
+ </x-nav-link>
+@endcan
+@can('ver-compras')
+ <x-nav-link :href="route('purchases.index')" :active="request()->routeIs('purchases.*')">
+ Compras
+ </x-nav-link>
+@endcan
+
                 @endcan
             </div>
         </div>
@@ -72,6 +83,16 @@
             @can('ver-ventas')
                 <x-responsive-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
                     Ventas
+                </x-responsive-nav-link>
+            @endcan
+            @can('ver-proveedores')
+                <x-responsive-nav-link :href="route('providers.index')" :active="request()->routeIs('providers.*')">
+                    Proveedores
+                </x-responsive-nav-link>
+            @endcan
+            @can('ver-compras')
+                <x-responsive-nav-link :href="route('purchases.index')" :active="request()->routeIs('purchases.*')">
+                    Compras
                 </x-responsive-nav-link>
             @endcan
         </div>

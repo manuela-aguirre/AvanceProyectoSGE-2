@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
 
         // Ordena los datos base antes de crear ventas vinculadas.
         $this->call([
-            ProveedorSeeder::class,
+            ProviderSeeder::class,
             CategoriaSeeder::class,
             ProductSeeder::class,
             VentaSeeder::class,

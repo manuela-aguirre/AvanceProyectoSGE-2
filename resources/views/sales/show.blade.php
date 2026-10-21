@@ -50,6 +50,8 @@
  </div>
  <div class="flex gap-4 border-t pt-4">
  <a href="{{ route('sales.index') }}" class="underline">← Volver al listado</a>
+ <a href="{{ route('sales.pdf', $sale) }}" target="_blank" class="text-blue-700
+underline">Descargar PDF</a>
  </div>
  </div>
  </div>

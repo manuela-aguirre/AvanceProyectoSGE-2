@@ -5,6 +5,7 @@ use App\Models\Client;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Services\SaleService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -15,7 +16,7 @@ class SaleController extends Controller implements HasMiddleware
  public static function middleware(): array
  {
  return [
- new Middleware('permission:ver-ventas', only: ['index', 'show']),
+ new Middleware('permission:ver-ventas', only: ['index', 'show', 'pdf']),
  new Middleware('permission:crear-ventas', only: ['create', 'store']),
  new Middleware('permission:eliminar-ventas', only: ['destroy']),
  ];
@@ -50,7 +51,7 @@ class SaleController extends Controller implements HasMiddleware
  return view('sales.create', [
  'clients' => Client::where('active', true)->orderBy('name')->get(['id', 'name',
 'document_number']),
-'products' => Product::where('stock', '>', 0)->orderBy('nombre')->get(['id', 'nombre', 'stock', 'precio']),
+ 'products' => Product::where('active', true)->where('stock', '>', 0)->orderBy('name')->get(['id', 'name', 'price', 'stock']),
  ]);
  }
  public function store(StoreSaleRequest $request, SaleService $service)
@@ -82,5 +83,13 @@ class SaleController extends Controller implements HasMiddleware
  });
  return redirect()->route('sales.index')
  ->with('success', "Venta «{$sale->invoice_number}» anulada y stock devuelto.");
+ }
+ // Clase 10: factura de venta en PDF
+ public function pdf(Sale $sale)
+ {
+ $sale->load(['client', 'user', 'details.product']);
+ return Pdf::loadView('pdf.sale', ['sale' => $sale])
+ ->setPaper('letter')
+ ->stream("{$sale->invoice_number}.pdf");
  }
 }

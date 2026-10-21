@@ -231,10 +231,10 @@
                        <nav x-show="openOperaciones" x-transition class="cotec-nav-group">
     <a href="{{ route('dashboard') }}" class="cotec-side-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
     <a href="{{ route('products.index') }}" class="cotec-side-link {{ request()->routeIs('products.*') ? 'active' : '' }}"><i class="fa-solid fa-boxes-stacked"></i> Productos</a>
-    <a href="{{ route('proveedores.index') }}" class="cotec-side-link {{ request()->routeIs('proveedores.*') ? 'active' : '' }}"><i class="fa-solid fa-truck-field"></i> Proveedores</a>
+    <a href="{{ route('providers.index') }}" class="cotec-side-link {{ request()->routeIs('proveedores.*') ? 'active' : '' }}"><i class="fa-solid fa-truck-field"></i> Proveedores</a>
     <a href="{{ route('sales.index') }}" class="cotec-side-link {{ request()->routeIs('sales.*') ? 'active' : '' }}"><i class="fa-solid fa-cash-register"></i> Ventas</a>
-    <a href="{{ route('compras.index') }}" class="cotec-side-link {{ request()->routeIs('compras.*') ? 'active' : '' }}"><i class="fa-solid fa-cart-shopping"></i> Compras</a>
-    <a href="{{ route('usuarios.index') }}" class="cotec-side-link {{ request()->routeIs('usuarios.*') ? 'active' : '' }}"><i class="fa-solid fa-user-group"></i> Usuarios</a>
+    <a href="{{ route('purchases.index') }}" class="cotec-side-link {{ request()->routeIs('compras.*') ? 'active' : '' }}"><i class="fa-solid fa-cart-shopping"></i> Compras</a>
+    <a href="{{ route('profile.edit') }}" class="cotec-side-link {{ request()->routeIs('profile.edit') ? 'active' : '' }}"><i class="fa-solid fa-user-group"></i> Usuarios</a>
 </nav>
 
                         <div class="cotec-section-label">

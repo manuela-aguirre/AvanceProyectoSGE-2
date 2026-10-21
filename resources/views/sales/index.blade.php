@@ -48,6 +48,7 @@ rounded-md">
  <td class="p-2 space-x-2">
  <a href="{{ route('sales.show', $sale) }}" class="text-blue-700
 underline">Ver</a>
+<a href="{{ route('sales.pdf', $sale) }}" target="_blank" class="text-gray-700 underline">PDF</a>
  @can('eliminar-ventas')
  <form method="POST" action="{{ route('sales.destroy', $sale) }}"
 class="inline"

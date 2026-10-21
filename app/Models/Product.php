@@ -47,6 +47,11 @@ class Product extends Model
         return $this->hasMany(SaleDetail::class);
     }
 
+    public function purchaseDetails()
+    {
+        return $this->hasMany(PurchaseDetail::class);
+    }
+
     /**
      * Scope reutilizable: filtra productos por texto (título o Código).
     * Uso: Product::buscar($texto)->get();

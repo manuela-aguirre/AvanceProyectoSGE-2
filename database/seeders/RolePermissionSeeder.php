@@ -15,7 +15,10 @@ class RolePermissionSeeder extends Seeder
  'ver-categorias', 'crear-categorias', 'editar-categorias', 'eliminar-categorias',
  'ver-clientes', 'crear-clientes', 'editar-clientes', 'eliminar-clientes',
  'ver-ventas', 'crear-ventas', 'editar-ventas', 'eliminar-ventas',
- 'ver-compras', 'crear-compras', 'editar-compras', 'eliminar-compras',
+ // Proveedores (Clase 10)
+ 'ver-proveedores', 'crear-proveedores', 'editar-proveedores', 'eliminar-proveedores',
+ // Compras (Clase 10: se agrega recibir-compras)
+ 'ver-compras', 'crear-compras', 'editar-compras', 'eliminar-compras', 'recibir-compras',
  'ver-reportes',
  // Clientes
  'ver-clientes', 'crear-clientes', 'editar-clientes', 'eliminar-clientes',
@@ -38,7 +41,8 @@ class RolePermissionSeeder extends Seeder
 Role::findOrCreate('almacenista')->syncPermissions([
  'ver-productos', 'crear-productos', 'editar-productos',
  'ver-categorias',
- 'ver-compras', 'crear-compras',
+ 'ver-proveedores', 'crear-proveedores', 'editar-proveedores',
+ 'ver-compras', 'crear-compras', 'recibir-compras',
 ]);
 
  }
