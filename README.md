@@ -22,8 +22,8 @@
 
 - Docker Desktop (con WSL2 si se trabaja en Windows)
 - Git
-- Composer y PHP 8.3 (opcional)
-
+- Composer y PHP 8.3
+  
 ## 3. Instalación desde cero
 
 ```bash
