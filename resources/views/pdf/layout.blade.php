@@ -52,7 +52,7 @@ font-size: 10px; }
  </header>
  <footer>
  Documento generado por el ERP el {{ now()->format('d/m/Y H:i') }} — Software de Gestión
-Empresarial · COTECNOVA
+Empresarial · LYRA
  </footer>
  <main>
  @yield('content')

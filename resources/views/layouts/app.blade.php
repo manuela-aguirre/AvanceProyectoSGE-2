@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'COTECNOVA ERP') }}</title>
+        <title>{{ config('app.name', 'LYRA ERP') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -288,7 +288,7 @@
 
                     <div>
                         <div style="font-size:0.7rem;letter-spacing:0.16em;text-transform:uppercase;opacity:0.7;margin-bottom:0.5rem;">Contacto</div>
-                        <div>ventas@cotecnova.edu.co</div>
+                        <div>ventas@lyra.com</div>
                     </div>
 
                     <div>

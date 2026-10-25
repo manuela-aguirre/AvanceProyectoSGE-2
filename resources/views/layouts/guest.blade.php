@@ -24,16 +24,16 @@
     <body class="font-sans antialiased text-slate-800">
         <div class="flex min-h-screen flex-col items-center justify-center px-4 py-8">
             <div class="mb-6 flex items-center gap-3">
-                @if (file_exists(public_path('build/images/logo-cotecnova.png')))
-                    <img src="{{ asset('build/images/logo-cotecnova.png') }}" alt="Logo COTECNOVA" class="h-14 w-14 object-contain" />
-                @elseif (file_exists(public_path('build/images/logo-cotecnova.svg')))
-                    <img src="{{ asset('build/images/logo-cotecnova.svg') }}" alt="Logo COTECNOVA" class="h-14 w-14 object-contain" />
+                @if (file_exists(public_path('build/images/logo-lyra.png')))
+                    <img src="{{ asset('build/images/logo-lyra.png') }}" alt="Logo LYRA" class="h-14 w-14 object-contain" />
+                @elseif (file_exists(public_path('build/images/logo-lyra.svg')))
+                    <img src="{{ asset('build/images/logo-lyra.svg') }}" alt="Logo LYRA" class="h-14 w-14 object-contain" />
                 @else
                     <x-application-logo class="h-14 w-14" />
                 @endif
                 <div>
                     <div class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#15803d]">Sistema</div>
-                    <div class="text-lg font-bold leading-tight text-[#14532d]">COTECNOVA ERP</div>
+                    <div class="text-lg font-bold leading-tight text-[#14532d]">LYRA ERP</div>
                 </div>
             </div>
 

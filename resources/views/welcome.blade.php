@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{{ config('app.name', 'COTECNOVA ERP') }}</title>
+        <title>{{ config('app.name', 'LYRA ERP') }}</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -502,13 +502,13 @@
                     <div class="cotec-brand">
                         <div class="cotec-brand-mark" style="background: transparent; box-shadow: none; border: none; border-radius: 0; width: 96px; height: 96px;">
                             <img
-                                src="{{ file_exists(public_path('build/images/logo-cotecnova.png')) ? asset('build/images/logo-cotecnova.png') : asset('build/images/logo-cotecnova.svg') }}"
-                                alt="Logo COTECNOVA"
+                                src="{{ file_exists(public_path('build/images/logo-lyra.png')) ? asset('build/images/logo-lyra.png') : asset('build/images/logo-lyra.svg') }}"
+                                alt="Logo LYRA"
                                 style="width:100%; height:100%; object-fit:contain; display:block;"
                             >
                         </div>
                         <div>
-                            <div class="cotec-brand-text">COTECNOVA ERP</div>
+                            <div class="cotec-brand-text">LYRA ERP</div>
                             <div class="cotec-brand-sub">ERP de ventas y compras</div>
                         </div>
                     </div>
@@ -529,7 +529,7 @@
                         <div class="cotec-kicker">Sistema de ventas y compras</div>
                         <h1 class="cotec-title">Tus ventas y compras, organizadas y conectadas.</h1>
                         <p class="cotec-subtitle">
-                            Gestiona ventas, compras, clientes, inventario y reportes con una plataforma clara, segura y pensada para la comunidad COTECNOVA.
+                            Gestiona ventas, compras, clientes, inventario y reportes con una plataforma clara, segura y pensada para la comunidad LYRA.
                         </p>
 
                         <div class="cotec-cta-row">
@@ -670,14 +670,14 @@
             <div class="cotec-footer-inner">
                 <div>
                     <div class="cotec-footer-brand">
-                        @if (file_exists(public_path('build/images/logo-cotecnova.png')))
-                            <img src="{{ asset('build/images/logo-cotecnova.png') }}" alt="Logo COTECNOVA" style="width:48px;height:48px;object-fit:contain;display:block;" />
-                        @elseif (file_exists(public_path('build/images/logo-cotecnova.svg')))
-                            <img src="{{ asset('build/images/logo-cotecnova.svg') }}" alt="Logo COTECNOVA" style="width:48px;height:48px;object-fit:contain;display:block;" />
+                        @if (file_exists(public_path('build/images/logo-lyra.png')))
+                            <img src="{{ asset('build/images/logo-lyra.png') }}" alt="Logo LYRA" style="width:48px;height:48px;object-fit:contain;display:block;" />
+                        @elseif (file_exists(public_path('build/images/logo-lyra.svg')))
+                            <img src="{{ asset('build/images/logo-lyra.svg') }}" alt="Logo LYRA" style="width:48px;height:48px;object-fit:contain;display:block;" />
                         @else
                             <div class="cotec-footer-brand-mark">B</div>
                         @endif
-                        <div>COTECNOVA ERP</div>
+                        <div>LYRA ERP</div>
                     </div>
                     <p>Sistema para la gestión eficiente de ventas, compras e inventario.</p>
                 </div>
@@ -694,7 +694,7 @@
                 <div>
                     <h3>Contacto</h3>
                     <ul>
-                        <li>ventas@cotecnova.edu.co</li>
+                        <li>ventas@lyra.com</li>
                         <li>+57 300 123 4567</li>
                         <li>Sede principal</li>
                     </ul>

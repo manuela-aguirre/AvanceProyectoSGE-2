@@ -251,13 +251,13 @@
                 <div class="cotec-header">
                     <div class="cotec-logo-circle" style="background: transparent; border-radius: 0; border: none; box-shadow: none; width: 88px; height: 88px;">
                         <img
-                            src="{{ file_exists(public_path('build/images/logo-cotecnova.png')) ? asset('build/images/logo-cotecnova.png') : asset('build/images/logo-cotecnova.svg') }}"
-                            alt="Logo COTECNOVA"
+                            src="{{ file_exists(public_path('build/images/logo-lyra.png')) ? asset('build/images/logo-lyra.png') : asset('build/images/logo-lyra.svg') }}"
+                            alt="Logo LYRA"
                             style="width:100%; height:100%; object-fit:contain; display:block;"
                         >
                     </div>
 
-                    <h1>COTECNOVA ERP</h1>
+                    <h1>LYRA ERP</h1>
                     <p class="subtitle">ERP de Ventas y Compras</p>
                     <p class="slogan">"Conocimiento al alcance de un clic"</p>
                 </div>
@@ -351,14 +351,14 @@
 
                     <!-- Pie -->
                     <div class="cotec-footer">
-                        <p>COTECNOVA ERP</p>
+                        <p>LYRA ERP</p>
                         <p class="highlight">Acceso exclusivo para usuarios autorizados</p>
                     </div>
 
                 </div>
             </div>
 
-            <p class="cotec-copyright">&copy; {{ date('Y') }} COTECNOVA. Todos los derechos reservados.</p>
+            <p class="cotec-copyright">&copy; {{ date('Y') }} LYRA. Todos los derechos reservados.</p>
 
         </div>
     </div>

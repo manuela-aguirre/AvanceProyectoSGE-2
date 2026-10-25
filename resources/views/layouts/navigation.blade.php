@@ -2,10 +2,10 @@
     <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:flex-nowrap sm:px-6 lg:px-8">
         <div class="flex items-center gap-4">
             <a href="{{ route('dashboard') }}" class="flex h-9 w-9 items-center justify-center rounded-md text-[#14532d]" aria-label="Dashboard">
-                @if (file_exists(public_path('build/images/logo-cotecnova.png')))
-                    <img src="{{ asset('build/images/logo-cotecnova.png') }}" alt="Logo COTECNOVA" class="h-9 w-9 object-contain" />
-                @elseif (file_exists(public_path('build/images/logo-cotecnova.svg')))
-                    <img src="{{ asset('build/images/logo-cotecnova.svg') }}" alt="Logo COTECNOVA" class="h-9 w-9 object-contain" />
+                @if (file_exists(public_path('build/images/logo-lyra.png')))
+                    <img src="{{ asset('build/images/logo-lyra.png') }}" alt="Logo LYRA" class="h-9 w-9 object-contain" />
+                @elseif (file_exists(public_path('build/images/logo-lyra.svg')))
+                    <img src="{{ asset('build/images/logo-lyra.svg') }}" alt="Logo LYRA" class="h-9 w-9 object-contain" />
                 @else
                     <x-application-logo class="h-9 w-9" />
                 @endif
