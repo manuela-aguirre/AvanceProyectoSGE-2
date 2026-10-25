@@ -167,7 +167,7 @@ Cálculo: `subtotal = Σ (cantidad × precio)` · `IVA = subtotal × 0.19` · `t
 - [`docs/avance2/`](docs/avance2/) – documento PDF del avance y capturas del segundo corte
 - [`docs/analisis.md`](docs/analisis.md) – análisis del negocio
 - [`docs/diccionario.md`](docs/diccionario.md) – diccionario de datos
-- [`docs/diagrama_mer.jpeg`](docs/diagrama_mer.png) – diagrama entidad-relación
+- [`docs/diagrama_mer.jpeg`](docs/diagrama_er.png) – diagrama entidad-relación
 - [`docs/clase10/capturas/`](docs/clase10/capturas/) – capturas de compras, PDF y dashboard
 
 ## 10. Comandos útiles
