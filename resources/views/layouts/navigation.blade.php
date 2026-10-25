@@ -44,6 +44,11 @@
  Compras
  </x-nav-link>
 @endcan
+@canany(['ver-usuarios', 'ver-roles', 'ver-permisos'])
+ <x-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*')">
+ Configuración
+ </x-nav-link>
+@endcanany
 
                 @endcan
             </div>
@@ -95,6 +100,11 @@
                     Compras
                 </x-responsive-nav-link>
             @endcan
+            @canany(['ver-usuarios', 'ver-roles', 'ver-permisos'])
+                <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*')">
+                    Configuración
+                </x-responsive-nav-link>
+            @endcanany
         </div>
     </div>
 </nav>

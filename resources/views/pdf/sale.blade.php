@@ -32,7 +32,7 @@
  @foreach ($sale->details as $i => $detail)
  <tr>
  <td>{{ $i + 1 }}</td>
- <td>{{ $detail->product?->name }}</td>
+ <td>{{ $detail->product?->nombre }}</td>
  <td class="right">{{ $detail->quantity }}</td>
  <td class="right">${{ number_format((float) $detail->unit_price, 2) }}</td>
  <td class="right">${{ number_format((float) $detail->subtotal, 2) }}</td>

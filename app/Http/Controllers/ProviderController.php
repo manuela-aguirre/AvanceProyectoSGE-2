@@ -19,7 +19,7 @@ class ProviderController extends Controller implements HasMiddleware
  }
  public function index(Request $request)
  {
- $showTrashed = $request->boolean('trashed') && $request->user()->can('eliminarproveedores');
+ $showTrashed = $request->boolean('trashed') && $request->user()->can('eliminar-proveedores');
  $providers = Provider::query()
  ->withCount('purchases')
  ->when($showTrashed, fn ($q) => $q->onlyTrashed())

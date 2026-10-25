@@ -1,72 +1,52 @@
 # Análisis de la Empresa
 
 ## 1. Datos Generales
-- **Nombre:** Biblioteca COTECNOVA
-- **Giro del negocio:** Gestión del catálogo bibliográfico y administración del préstamo e inventario de libros de una biblioteca institucional.
+- **Nombre:** LYRA
+- **Giro del negocio:** Comercialización de productos de consumo y de oficina (tecnología, papelería, aseo, alimentos, ferretería y hogar). Compra la mercancía a proveedores, la almacena y la vende a clientes, con control del inventario en cada movimiento.
 - **Tamaño:** Pequeña
+- **Sistema:** SGE, un ERP web que integra inventario, clientes, ventas, proveedores y compras, con control de acceso por roles y permisos.
 
 ## 2. Procesos Clave
-- **Ventas:** El negocio no maneja ventas comerciales; en su lugar opera un servicio de préstamo de libros. Los usuarios registrados consultan el catálogo disponible y el sistema controla qué libros pueden prestarse según el stock disponible.
-- **Compras:** La biblioteca adquiere nuevos títulos a distintas editoriales (por ejemplo Pearson, McGraw-Hill, Alfaomega, Planeta, Trillas, Norma, Anaya, Penguin Random House, O'Reilly Media y Santillana) para ampliar el catálogo.
-- **Inventario:** Cada libro registra un campo `stock` que indica la cantidad de ejemplares disponibles. El inventario se organiza además por `editorial_id` y `genero_id`, lo que permite clasificar y consultar el material por casa editorial y por categoría temática.
-- **Otros:** Se gestionan usuarios autenticados (con `tipo_identificacion` y `numero_identificacion`), editoriales y géneros como catálogos de apoyo para clasificar los libros.
 
-## 3. Entidades Identificadas (Tablas)
-- Usuarios (`users`)
-- Editoriales (`editorials`)
-- Géneros (`generos`)
-- Libros (`libros`)
+- **Compras:** LYRA abastece su inventario con proveedores como Mayorista Digital SAS, Papelería Mayorista, Químicos y Aseo Ltda. o Ferretería Central. Primero se registra una **orden de compra** (`OC-00001`) en estado *pendiente*. La orden **no mueve el inventario**: el stock solo sube cuando la mercancía llega a bodega. La recepción puede ser **total** o **parcial** (la orden pasa a *parcial* y luego a *recibida*) y nunca se puede recibir más de lo pedido. Una orden solo se anula si todavía no ha llegado mercancía. La orden se imprime en PDF.
+- **Inventario:** Cada producto (`productos`) tiene código, precio, `stock`, categoría y proveedor. El stock **sube** al recibir una compra y **baja** al registrar una venta. Si una venta se anula, el stock se devuelve. Los productos con stock de 5 unidades o menos se marcan como stock bajo y se sugieren para reabastecer. Los productos, categorías, clientes y proveedores no se borran de forma definitiva: van a una **papelera** (Soft Delete) y se pueden restaurar.
+- **Ventas:** Un vendedor registra una venta a un cliente con uno o varios productos. El sistema valida el stock, calcula subtotal, IVA (19 %) y total, asigna un número de factura secuencial (`FV-00001`), crea la cabecera y el detalle y descuenta el inventario, todo en **una sola transacción**. Si falta stock o un producto no tiene precio, no se registra nada. La factura se imprime en PDF y la venta puede anularse devolviendo el stock.
+- **Seguridad y administración:** Los usuarios tienen roles según su puesto (administrador, vendedor y almacenista). Un usuario puede tener varios roles y elegir con cuál trabajar al iniciar sesión (rol activo), además de permisos directos. Desde Configuración el administrador gestiona usuarios, roles y la matriz de permisos.
+- **Seguimiento (Dashboard):** Muestra indicadores según los permisos de cada usuario: ventas y compras del mes, órdenes por recibir, stock bajo, valor del inventario, clientes y proveedores activos y el Top 5 de productos más vendidos.
 
-## 4. Diccionario de Datos (Mínimo 3 tablas)
+## 3. Cambios respecto al primer corte
 
-### Tabla: users
-| Campo | Tipo | Descripción |
+| Primer corte | Segundo corte |
+|---|---|
+| CRUD de productos y categorías | Se añaden clientes, ventas (cabecera + detalle), proveedores y compras (cabecera + detalle) |
+| Sin control de acceso | Spatie Permission: roles por puesto, permisos por módulo, rol activo y permisos directos |
+| Eliminación definitiva | Soft Delete con papelera y restauración |
+| Stock editado a mano | Stock que cambia por reglas: compra recibida (sube), venta (baja) y anulación (devuelve) |
+| Sin documentos | PDF de factura de venta y de orden de compra |
+| Sin indicadores | Dashboard con KPIs por permisos y Top 5 |
+| Lógica en controladores | Servicios con `DB::transaction` (`SaleService`, `PurchaseService`, `AccessControlService`) |
+
+## 4. Entidades Identificadas (Tablas)
+
+| Tabla | Descripción |
+|---|---|
+| `users` | Usuarios del sistema (con `active`) |
+| `roles`, `permissions`, `model_has_roles`, `model_has_permissions`, `role_has_permissions` | Roles y permisos (Spatie) |
+| `categorias` | Categorías de productos |
+| `productos` | Productos e inventario |
+| `providers` | Proveedores |
+| `purchases` | Órdenes de compra (cabecera) |
+| `purchase_details` | Productos de cada orden de compra |
+| `clients` | Clientes |
+| `sales` | Ventas (cabecera) |
+| `sale_details` | Productos de cada venta |
+
+
+
+## 5. Roles del sistema
+
+| Rol | Puesto | Responsabilidad |
 |---|---|---|
-| id | BIGINT | Identificador único del usuario |
-| name | VARCHAR(255) | Nombre del usuario |
-| tipo_identificacion | VARCHAR(10), nullable | Tipo de documento de identificación (CC, TI, etc.) |
-| numero_identificacion | VARCHAR(30), nullable | Número del documento de identificación |
-| email | VARCHAR(255), único | Correo electrónico del usuario |
-| email_verified_at | TIMESTAMP, nullable | Fecha de verificación del correo |
-| password | VARCHAR(255) | Contraseña encriptada |
-| remember_token | VARCHAR(100), nullable | Token para sesión persistente |
-| created_at | TIMESTAMP | Fecha de creación del registro |
-| updated_at | TIMESTAMP | Fecha de última actualización |
-
-### Tabla: editorials
-| Campo | Tipo | Descripción |
-|---|---|---|
-| id | BIGINT | Identificador único de la editorial |
-| nombre | VARCHAR(100) | Nombre de la casa editorial |
-| created_at | TIMESTAMP | Fecha de creación del registro |
-| updated_at | TIMESTAMP | Fecha de última actualización |
-
-### Tabla: generos
-| Campo | Tipo | Descripción |
-|---|---|---|
-| id | BIGINT | Identificador único del género |
-| nombre | VARCHAR(50) | Nombre del género o categoría temática del libro |
-| created_at | TIMESTAMP | Fecha de creación del registro |
-| updated_at | TIMESTAMP | Fecha de última actualización |
-
-### Tabla: libros
-| Campo | Tipo | Descripción |
-|---|---|---|
-| id | BIGINT | Identificador único del libro |
-| titulo | VARCHAR(150) | Título del libro |
-| descripcion | TEXT, nullable | Breve descripción o sinopsis del libro |
-| portada_url | VARCHAR(255), nullable | URL de la imagen de portada |
-| stock | INTEGER, default 0 | Cantidad de ejemplares disponibles para préstamo |
-| isbn | VARCHAR(20), nullable | Código ISBN del libro |
-| editorial_id | BIGINT, FK → editorials.id | Editorial que publicó el libro |
-| genero_id | BIGINT, FK → generos.id | Género temático del libro |
-| created_at | TIMESTAMP | Fecha de creación del registro |
-| updated_at | TIMESTAMP | Fecha de última actualización |
-
-## 5. Diagrama Entidad-Relación (MER)
-[Incluir imagen del diagrama ER — pendiente de agregar en `docs/diagrama_mer.png`]
-
-**Relaciones principales:**
-- `Editorial` 1:N `Libro` (una editorial publica muchos libros; cada libro pertenece a una editorial)
-- `Genero` 1:N `Libro` (un género agrupa muchos libros; cada libro pertenece a un género)
-- `User` consulta y gestiona el catálogo (autenticación para administrar libros, editoriales y géneros)
+| `admin` | Administrador | Todo el sistema y la Configuración (usuarios, roles, permisos) |
+| `vendedor` | Vendedor | Consultar productos, gestionar clientes y registrar ventas |
+| `almacenista` | Almacenista / compras | Gestionar productos y proveedores, registrar órdenes de compra y recibir mercancía |

@@ -1,375 +1,192 @@
-# SGE - Sistema de Gestión de Biblioteca COTECNOVA
+# SGE – Sistema de Gestión Empresarial (ERP)
 
-Proyecto Laravel para la gestión del catálogo bibliográfico y la administración básica de una biblioteca universitaria. El sistema permite gestionar libros, editoriales, géneros y usuarios autenticados, con un módulo CRUD para la entidad principal y una base de datos estructurada para soportar procesos de catalogación y consulta.
+**Asignatura:** Software de Gestión Empresarial – COTECNOVA 2026
+**Empresa:** Lyra
+**Integrantes:** Manuela Aguirre - Alejandra Díaz
+**Entrega:** Segundo corte – tag `avance-2`
 
-## 1. Descripción del proyecto
+ERP web construido con Laravel para gestionar inventario, clientes, ventas, proveedores y compras, con control de acceso por roles y permisos, dashboard de indicadores y documentos PDF.
 
-La aplicación fue desarrollada como entregable del primer. Su objetivo principal es digitalizar y organizar el proceso de gestión del inventario bibliográfico, facilitando la administración del catálogo, la relación entre libros y sus categorías, y la operación básica de una biblioteca institucional.
+---
 
-## 2. Requisitos del sistema
+## 1. Módulos del sistema
 
-- Docker Desktop
-- WSL2 (si se trabaja desde Windows)
-- Composer
-- Laravel Sail
+| Módulo | Qué hace |
+|---|---|
+| Productos y categorías | CRUD con búsqueda, paginación, papelera y restauración (Soft Delete) |
+| Clientes | CRUD con filtros, papelera y restauración |
+| Ventas | Cabecera + detalle, número secuencial `FV-00001`, descuento de stock, anulación con devolución de stock, factura en PDF |
+| Proveedores | CRUD con papelera y restauración |
+| Compras | Órdenes `OC-00001`, recepción total o parcial que aumenta el stock, anulación, orden en PDF |
+| Dashboard | KPIs filtrados por permisos y Top 5 de productos más vendidos |
+| Configuración | Usuarios (varios roles y permisos directos), roles, matriz de permisos y rol activo al iniciar sesión |
+
+## 2. Requisitos
+
+- Docker Desktop (con WSL2 si se trabaja en Windows)
 - Git
+- Composer y PHP 8.3 (opcional; ver el paso 2 si no se tienen)
 
-## 3. Instalación y configuración
+## 3. Instalación desde cero
 
 ```bash
-# Clonar el repositorio
-git clone <URL-del-repositorio>
+# 1. Clonar el repositorio y entrar a la carpeta
+git clone <URL-DEL-REPOSITORIO> sge
 cd sge
 
-# Instalar dependencias de PHP
-composer install
+# (Opcional) ubicarse en la versión entregada del segundo corte
+git checkout avance-2
 
-# Copiar variables de entorno
+# 2. Instalar dependencias de PHP (la carpeta vendor/ no viene en el repositorio)
+composer install
+#    Si no tienes Composer instalado, usa este contenedor temporal:
+docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html \
+    laravelsail/php83-composer:latest composer install --ignore-platform-reqs
+
+# 3. Copiar las variables de entorno (el archivo .env no viene en el repositorio)
 cp .env.example .env
 
-# Iniciar contenedores con Sail
+# 4. Levantar los contenedores
 ./vendor/bin/sail up -d
 
-# Generar la clave de la aplicación
+# 5. Generar la clave de la aplicación
 ./vendor/bin/sail artisan key:generate
 
-# Ejecutar migraciones y sembrar datos de prueba
-./vendor/bin/sail artisan migrate:fresh --seed
+# 6. Crear las tablas y cargar los datos de prueba
+./vendor/bin/sail artisan migrate --seed
+
+# 7. Instalar y compilar los assets (Tailwind / Vite)
+./vendor/bin/sail npm install
+./vendor/bin/sail npm run build
 ```
 
-Luego se puede acceder a la aplicación desde el navegador y crear una cuenta en /register. Si se desea entrar rápidamente, el seeder crea un usuario de prueba con la cuenta test@example.com.
+Abrir <http://localhost> en el navegador.
 
-## 4. Estructura del proyecto
+> **Si ya existe una base de datos con datos y quieres reiniciarla:** `./vendor/bin/sail artisan migrate:fresh --seed`
 
-El proyecto sigue el patrón MVC de Laravel y está organizado en las carpetas estándar del framework:
+> **Si el puerto 80 está ocupado:** agrega `APP_PORT=8080` en el `.env` y usa <http://localhost:8080>.
 
-- app/ — modelos, controladores, componentes y lógica de negocio
-- database/migrations/ — migraciones de la base de datos
-- database/seeders/ — sembrado inicial de datos de prueba
-- resources/views/ — vistas Blade
-- routes/ — definiciones de rutas
-- docs/ — análisis de negocio, diccionario de datos y diagramas
+### Configuración de la base de datos en `.env`
 
-## 5. Entidades principales
+Para Sail con MySQL, verifica que estas variables estén así:
 
-| Entidad | Descripción |
+```env
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=sge
+DB_USERNAME=sail
+DB_PASSWORD=password
+```
+
+## 4. Usuarios de prueba
+
+Todos los usuarios tienen la contraseña **`password`**.
+
+| Rol | Correo | Qué puede hacer |
+|---|---|---|
+| `admin` | `admin@test.com` | Todo, incluida la Configuración (usuarios, roles, permisos) |
+| `vendedor` | `vendedor@test.com` | Ver productos; ver, crear y editar clientes; ver y crear ventas |
+| `almacenista` | `almacenista@test.com` | Productos (ver, crear, editar), ver categorías, proveedores (ver, crear, editar), compras (ver, crear, recibir) |
+| `vendedor` + `almacenista` | `supervisor@test.com` | Tiene **dos roles**: al iniciar sesión elige el rol activo. Además tiene el **permiso directo** `ver-reportes` |
+| `admin` | `test@example.com` | Administrador creado por el `DatabaseSeeder` |
+
+### Rol activo
+
+Si un usuario tiene más de un rol (por ejemplo `supervisor@test.com`), después del login se le pide elegir con qué rol quiere trabajar. Esa elección se guarda en la sesión.
+
+### Permisos
+
+Los permisos siguen la convención `accion-modulo` (`ver-productos`, `recibir-compras`, etc.) y se administran desde **Configuración → Permisos** (matriz módulo × acción).
+
+## 5. Flujo de prueba sugerido
+
+1. Iniciar sesión como `almacenista@test.com`, crear una **orden de compra** a un proveedor.
+2. **Recibir parcialmente** la orden: el stock del producto sube.
+3. Intentar recibir **más de lo pedido**: el sistema lo rechaza.
+4. Iniciar sesión como `vendedor@test.com` y registrar una **venta**: el stock baja y se genera el número `FV-xxxxx`.
+5. Intentar vender **más que el stock disponible**: el sistema lo rechaza.
+6. Abrir el **PDF** de la factura y de la orden de compra.
+7. **Anular** la venta: el stock se devuelve.
+8. Revisar el **Dashboard**: los KPIs reflejan los cambios.
+9. Con `vendedor@test.com`, entrar a `/purchases`: responde **403** por falta de permiso.
+10. Con `admin@test.com`, revisar **Configuración** y la matriz de permisos.
+
+## 6. Datos de prueba (seeders)
+
+`php artisan migrate --seed` ejecuta `DatabaseSeeder`, que llama a:
+
+| Seeder | Contenido |
 |---|---|
-| User | Usuarios de la aplicación y autenticación Laravel |
-| Editorial | Casa editorial que publica los libros |
-| Genero | Categoría o temática del libro |
-| Libro | Entidad principal del sistema, representa el catálogo bibliográfico |
+| `RolePermissionSeeder` | Permisos y roles `admin`, `vendedor`, `almacenista` |
+| `ProviderSeeder` | Proveedores |
+| `CategoriaSeeder` | Categorías |
+| `ProductSeeder` | Productos con stock y precio |
+| `CompraSeeder` | Órdenes de compra de ejemplo |
+| `ClientSeeder` | Clientes |
+| `TestUserSeeder` | Usuarios de prueba por rol (sección 4) |
+| `SaleSeeder` | Ventas de ejemplo |
 
-## 6. Relaciones del negocio
 
-- Editorial tiene muchos Libro.
-- Genero tiene muchos Libro.
-- Cada Libro pertenece a una Editorial y a un Genero.
+### Modelo de datos
 
-## 7. Módulo CRUD de libros
-
-El sistema cuenta con un módulo completo para la administración del catálogo de libros.
-
-### Rutas
-
-```php
-Route::resource('libros', LibroController::class);
-```
-
-### Controlador
-
-El controlador principal es LibroController, y maneja las operaciones de:
-- listado index
-- creación create
-- almacenamiento store
-- edición edit
-- actualización update
-- eliminación destroy
-
-### Vistas Blade
-
-- resources/views/libros/index.blade.php
-- resources/views/libros/create.blade.php
-- resources/views/libros/edit.blade.php
-
-### Eager loading
-
-Se usa with(['editorial', 'genero']) para evitar el problema N+1 al listar libros y cargar sus relaciones.
-
-### Scopes reutilizables
-
-En el modelo Libro se definen scopes para reutilizar consultas:
-- scopeBuscar($query, $texto)
-- scopeConStock($query)
-
-## 8. Sembrado de datos de prueba
-
-Los seeders crean registros iniciales para apoyar la validación del negocio y del flujo CRUD.
-
-```bash
-./vendor/bin/sail artisan db:seed
-```
-
-## 9. Comandos útiles
-
-```bash
-# Ejecutar migraciones desde cero
-./vendor/bin/sail artisan migrate:fresh --seed
-
-# Ver estado de migraciones
-./vendor/bin/sail artisan migrate:status
-
-# Abrir el shell de Laravel
-./vendor/bin/sail artisan tinker
-
-# Revisar errores de la aplicación
-./vendor/bin/sail artisan route:list
-```
-
-## 10. Documentación del entregable
-
-- [docs/analisis.md](docs/analisis.md) — análisis del negocio y procesos clave
-- [docs/diccionario.md](docs/diccionario.md) — diccionario de datos
-- [docs/diagrama_mer.png](docs/diagrama_mer.png) — diagrama entidad-relación
-
-## 11.Integración de módulos y Dashboard con KPIs
-
-Se conectan los módulos existentes de productos y categorías con los módulos de clientes y ventas mediante transacciones y reglas de negocio, esto permite que al registrar una venta se descuente del inventario automáticamente, además, se construye un Dashboard con indicadores clave (KPIs).
-
-### 11.1 ¿Qué se implementó? 
-
-- **Módulo de Clientes:** CRUD con búsqueda, filtro por estado, paginación, papelera y restauración (Soft Delete).
-- **Módulo de Ventas:** listado con filtros por texto y fechas, formulario de nueva venta con filas dinámicas (JavaScript), factura y anulación.
-- **`SaleService`:** encapsula la lógica de la venta dentro de `DB::transaction`.
-- **Regla inversa:** al anular una venta se devuelve el stock a los productos.
-- **Dashboard con KPIs:** tarjetas de indicadores y Top 5 de productos más vendidos, filtrados por permisos.
-- **Permisos nuevos:** clientes, ventas y reportes, asignados por rol.
-
-### 11.2 Flujo de una venta
-
-```
-Vendedor → "Nueva venta" → selecciona cliente → agrega productos y cantidades
-        → el formulario calcula subtotal, IVA y total en tiempo real
-        → al guardar (todo dentro de UNA transacción):
-              1. valida el stock de cada producto
-              2. crea la venta (cabecera)  → tabla sales
-              3. crea los detalles         → tabla sale_details
-              4. descuenta el stock        → tabla productos
-        → redirige a la factura con mensaje de éxito
-        → el Dashboard refleja los nuevos datos
-```
-
-Si algún paso falla (por ejemplo, stock insuficiente), la venta se cancela, restaurando los datos, haciendo que no queden ventas huérfanas ni stock descontado sin venta.
-
-### 11.3 Modelo de datos
-
-```
-Clients (1) ──< Sales (N) ──< SaleDetails (N) >── (1) Productos
-Users   (1) ──< Sales (N)
-```
 
 | Tabla | Campos principales |
 |---|---|
-| `clients` | `document_type` (CC/NIT/CE/PP), `document_number` (único), `name`, `email`, `phone`, `address`, `active`, `deleted_at` |
-| `sales` | `invoice_number` (único, `FV-00001`), `client_id`, `user_id`, `sale_date`, `subtotal`, `tax`, `total`, `status` (pendiente / pagada / anulada), `notes`, `deleted_at` |
+| `clients` | `document_type`, `document_number` (único), `name`, `email`, `phone`, `address`, `active`, `deleted_at` |
+| `sales` | `invoice_number` (único, `FV-00001`), `client_id`, `user_id`, `sale_date`, `subtotal`, `tax`, `total`, `status`, `notes`, `deleted_at` |
 | `sale_details` | `sale_id`, `product_id`, `quantity`, `unit_price`, `subtotal` |
+| `providers` | `document_type`, `document_number` (único), `name`, `contact_name`, `email`, `phone`, `address`, `active`, `deleted_at` |
+| `purchases` | `purchase_number` (único, `OC-00001`), `provider_id`, `user_id`, `purchase_date`, `provider_invoice`, `subtotal`, `tax`, `total`, `status` (pendiente / parcial / recibida / anulada), `received_at`, `deleted_at` |
+| `purchase_details` | `purchase_id`, `product_id`, `quantity` (pedida), `received_quantity`, `unit_cost`, `subtotal` |
 
-Cálculo: `subtotal = Σ (cantidad × precio_unitario)` · `IVA = subtotal × 0.19` · `total = subtotal + IVA`.
+Cálculo: `subtotal = Σ (cantidad × precio)` · `IVA = subtotal × 0.19` · `total = subtotal + IVA`.
 
-### 11.4 Reglas de negocio
 
-- No se puede vender más cantidad que el stock disponible (`SaleService`).
-- No se puede vender un producto sin precio configurado (`SaleService` y `StoreSaleRequest`).
-- La venta debe tener al menos un producto y cantidades enteras ≥ 1 (`StoreSaleRequest`).
-- El cliente debe existir, estar activo y no estar en la papelera (`StoreSaleRequest`).
-- Si un producto se repite en dos filas, las cantidades se suman antes de validar el stock.
-- `lockForUpdate()` bloquea la fila del producto durante la transacción para que dos vendedores no vendan el mismo stock a la vez.
-- Cada venta queda asociada a un cliente y al usuario vendedor autenticado.
-- El número de factura es secuencial (`FV-00001`, `FV-00002`, …).
-- Al anular una venta se devuelve el stock y la venta queda con `status = anulada` y *soft delete* (`SaleController::destroy`).
-- No se puede eliminar un cliente que tenga ventas asociadas (`ClientController::destroy`).
+## 7. Seguridad
 
-Las reglas viven en servicios, controladores y Form Requests, no en las vistas.
+- **Spatie Laravel Permission:** roles por puesto de trabajo y permisos por módulo.
+- **Middleware en controladores:** cada acción declara `permission:*`; sin permiso el sistema responde 403.
+- **`@can` en vistas:** los botones y enlaces solo aparecen a quien tiene el permiso.
+- **Rol activo:** `EnsureActiveRole` obliga a elegir rol a los usuarios con varios roles y cierra la sesión de usuarios desactivados.
+- **Permisos directos:** se asignan a un usuario desde Configuración → Usuarios, además de los de sus roles.
+- **Soft Delete:** productos, categorías, clientes, proveedores, ventas y compras se envían a la papelera y se pueden restaurar.
 
-### 11.5 Roles y permisos
-
-| Rol | Permisos relevantes |
-|---|---|
-| `admin` | Todos |
-| `vendedor` | ver-productos, ver/crear/editar-clientes, ver/crear-ventas |
-| `almacenista` | ver/crear/editar-productos, ver-categorias, ver/crear-compras (no ve Clientes ni Ventas) |
-
-Cada controlador declara su middleware `permission:*` y las vistas usan `@can(...)` para mostrar u ocultar enlaces.
-
-### 11.6 Rutas
-
-```php
-Route::patch('clients/{client}/restore', [ClientController::class, 'restore'])
-    ->withTrashed()->name('clients.restore');
-Route::resource('clients', ClientController::class)->except('show');
-Route::resource('sales', SaleController::class)
-    ->only(['index', 'create', 'store', 'show', 'destroy']);
-```
-
-### 11.7 Dashboard con KPIs
+## 8. Dashboard
 
 | KPI | Permiso requerido |
 |---|---|
-| Productos registrados | `ver-productos` |
-| Stock bajo (≤ 5 unidades) | `ver-productos` |
-| Unidades en inventario | `ver-productos` |
+| Productos, stock bajo (≤ 5) y valor del inventario | `ver-productos` |
 | Clientes activos | `ver-clientes` |
 | Ventas del mes (cantidad y valor) | `ver-ventas` |
-| Top 5 productos más vendidos del mes | `ver-ventas` o `ver-reportes` |
-
-Las tarjetas de acceso a cada módulo solo aparecen si el usuario tiene el permiso `ver-*` correspondiente.
-
-### 11.8 Archivos principales de la clase
-
-- Modelos: `Client`, `Sale`, `SaleDetail` (nuevos) y `Product` (relación `saleDetails`)
-- Servicio: `app/Services/SaleService.php`
-- Controladores: `ClientController`, `SaleController`, `DashboardController` (KPIs)
-- Form Requests: `StoreClientRequest`, `UpdateClientRequest`, `StoreSaleRequest`
-- Migraciones: `create_clients_table`, `create_sales_table`, `create_sale_details_table`
-- Vistas: `resources/views/clients/*`, `resources/views/sales/*`, `dashboard.blade.php`, `layouts/app.blade.php` (`@stack('scripts')`) y `layouts/navigation.blade.php`
-- Rutas: `routes/web.php`
-
-### 11.9 Adaptaciones respecto a la guía
-
-- La tabla de productos se llama `productos` y sus columnas están en español (`nombre`, `precio`, `stock`, `codigo`), por eso `sale_details.product_id` referencia `productos`.
-- `productos` no tiene columna `active`; en lugar de validar "producto activo" se exige que el producto tenga precio.
-- El KPI "Productos activos" pasó a **Productos registrados** y se agregó **Unidades en inventario**.
-- El módulo de ventas anterior (`ventas`) fue reemplazado por el flujo `sales` / `sale_details`.
-
-
-## 12. Clase 10 – Compras y PDF
- 
-Se completa el ciclo del inventario con los módulos de proveedores y compras: al registrar una orden de compra y recibir la mercancía, el stock aumenta automáticamente (total o parcialmente). Además se generan documentos en PDF (orden de compra y factura de venta) con DomPDF y se amplía el Dashboard con KPIs de compras.
- 
-### 12.1 ¿Qué se implementó?
- 
-- **Módulo de Proveedores:** CRUD con búsqueda, paginación, papelera y restauración (Soft Delete).
-- **Módulo de Compras:** listado con filtros por texto, estado y fechas, formulario de nueva orden con filas dinámicas (JavaScript), detalle de la orden, recepción total o parcial y anulación.
-- **`PurchaseService`:** encapsula la lógica de la compra dentro de `DB::transaction` (`register`, `receive` y `cancel`).
-- **Regla clave:** pedir no es recibir; el stock solo aumenta al recibir la mercancía.
-- **Reportes PDF (DomPDF):** orden de compra y factura de venta sobre una plantilla base compartida (`pdf/layout.blade.php`).
-- **Dashboard con KPIs de compras:** tarjetas nuevas y tabla de productos para reabastecer, filtradas por permisos.
-- **Permisos nuevos:** proveedores y `recibir-compras`, asignados por rol.
- 
-### 12.2 Modelo de datos
- 
-```
-Providers (1) ──< Purchases (N) ──< PurchaseDetails (N) >── (1) Productos
-Users     (1) ──< Purchases (N)
-```
- 
-| Tabla | Campos principales |
-|---|---|
-| `providers` | `document_type` (NIT/CC/CE/PP), `document_number` (único), `name`, `contact_name`, `email`, `phone`, `address`, `active`, `deleted_at` |
-| `purchases` | `purchase_number` (único, `OC-00001`), `provider_id`, `user_id`, `purchase_date`, `provider_invoice`, `subtotal`, `tax`, `total`, `status` (pendiente / parcial / recibida / anulada), `received_at`, `notes`, `deleted_at` |
-| `purchase_details` | `purchase_id`, `product_id`, `quantity` (pedida), `received_quantity` (recibida), `unit_cost`, `subtotal` |
- 
-Cálculo: `subtotal = Σ (cantidad_pedida × costo_unitario)` · `IVA = subtotal × 0.19` · `total = subtotal + IVA`.
- 
-### 12.3 Reglas de negocio
- 
-- La orden debe tener un proveedor existente, activo y fuera de la papelera (`StorePurchaseRequest`).
-- La orden debe tener al menos un producto, con cantidades enteras ≥ 1 y costo unitario mayor que cero (`StorePurchaseRequest`).
-- Un producto no puede repetirse en dos filas de la misma orden (`distinct` en `StorePurchaseRequest`).
-- La fecha de la orden no puede ser futura (`StorePurchaseRequest`).
-- El número de orden es secuencial (`OC-00001`, `OC-00002`, …).
-- El stock aumenta al recibir, no al crear la orden (`PurchaseService::receive`).
-- Solo se reciben órdenes en estado pendiente o parcial (`PurchaseService`).
-- No se puede recibir más de lo pedido: pendiente = pedida − recibida (`PurchaseService`).
-- Una recepción debe traer al menos una unidad (`PurchaseService`).
-- `lockForUpdate()` bloquea la orden durante la recepción para que dos almacenistas no registren la misma entrega a la vez.
-- Solo se puede anular una orden pendiente; si ya llegó mercancía no se anula (`PurchaseService::cancel`). La orden anulada queda con `status = anulada` y *soft delete*.
-- No se puede eliminar un proveedor que tenga compras asociadas (`ProviderController::destroy`).
-Las reglas viven en servicios, controladores y Form Requests, no en las vistas.
- 
-### 12.4 Roles y permisos
- 
-| Rol | Permisos relevantes |
-|---|---|
-| `admin` | Todos |
-| `vendedor` | Sin cambios (no ve Proveedores ni Compras; sí puede abrir el PDF de sus ventas) |
-| `almacenista` | ver/crear/editar-proveedores, ver/crear/recibir-compras (no elimina proveedores, no anula compras y no abre el PDF de ventas) |
- 
-Se agrega el permiso `recibir-compras`, porque no siempre quien pide la mercancía es quien la recibe en bodega. Cada controlador declara su middleware `permission:*` y las vistas usan `@can(...)`. El PDF de la orden de compra requiere `ver-compras` y el de la factura requiere `ver-ventas`.
- 
-### 12.5 Rutas
- 
-```php
-Route::patch('providers/{provider}/restore', [ProviderController::class, 'restore'])
-    ->withTrashed()->name('providers.restore');
-Route::resource('providers', ProviderController::class)->except('show');
- 
-Route::patch('purchases/{purchase}/receive', [PurchaseController::class, 'receive'])
-    ->name('purchases.receive');
-Route::get('purchases/{purchase}/pdf', [PurchaseController::class, 'pdf'])
-    ->name('purchases.pdf');
-Route::resource('purchases', PurchaseController::class)
-    ->only(['index', 'create', 'store', 'show', 'destroy']);
- 
-Route::get('sales/{sale}/pdf', [SaleController::class, 'pdf'])->name('sales.pdf');
-```
- 
-### 12.6 Dashboard con KPIs de compras
- 
-| KPI | Permiso requerido |
-|---|---|
-| Compras del mes (cantidad y valor) | `ver-compras` |
-| Órdenes por recibir (pendientes o parciales) | `ver-compras` |
+| Compras del mes y órdenes por recibir | `ver-compras` |
 | Proveedores activos | `ver-proveedores` |
 | Ventas − Compras del mes | `ver-reportes` |
-| Tabla de productos para reabastecer | `crear-compras` |
- 
-Las tarjetas de Proveedores y Compras solo aparecen si el usuario tiene el permiso `ver-*` correspondiente.
- 
-### 12.7 Archivos principales de la clase
- 
-- Modelos: `Provider`, `Purchase`, `PurchaseDetail` (nuevos) y `Product` (relación `purchaseDetails`)
-- Servicio: `app/Services/PurchaseService.php`
-- Controladores: `ProviderController`, `PurchaseController`, `SaleController` (método `pdf`), `DashboardController`
-- Form Requests: `StoreProviderRequest`, `UpdateProviderRequest`, `StorePurchaseRequest`, `ReceivePurchaseRequest`
-- Migraciones: `create_providers_table`, `create_purchases_table`, `create_purchase_details_table`
-- Seeders: `ProviderSeeder` y `RolePermissionSeeder` (permisos nuevos)
-- Vistas: `resources/views/providers/*`, `resources/views/purchases/*`, `resources/views/pdf/*`, `dashboard.blade.php`, `layouts/navigation.blade.php`
-- Rutas: `routes/web.php`
-### 12.8 Adaptaciones respecto a la guía
- 
-- La tabla de productos se llama `productos` y sus columnas están en español, por eso `purchase_details.product_id` referencia `productos`.
+| Top 5 productos más vendidos del mes | `ver-ventas` o `ver-reportes` |
+| Productos para reabastecer | `crear-compras` |
 
-### 12.9 Evidencias
- 
-| Evidencia | Archivo |
-|---|---|
-| Listado de Proveedores | `docs/clase_10/capturas/proveedores.png` |
-| Formulario de nueva orden de compra con productos y totales | `docs/clase_10/capturas/compra_nueva.png` |
-| Detalle de una orden en estado Parcial | `docs/clase_10/capturas/compra_parcial.png` |
-| Error «No se puede recibir más de lo pedido» | `docs/clase_10/capturas/error_recepcion.png` |
-| MySQL: compra, detalles y stock aumentado | `docs/clase_10/capturas/mysql_compra.png` |
-| PDF de la orden de compra | `docs/clase_10/capturas/pdf_orden.png` |
-| PDF de la factura de venta | `docs/clase_10/capturas/pdf_factura.png` |
-| Dashboard con los KPIs nuevos | `docs/clase_10/capturas/dashboard_compras.png` |
- 
-![Proveedores](docs/clase_10/capturas/proveedores.png)
-![Nueva orden de compra](docs/clase_10/capturas/compra_nueva.png)
-![Orden parcial](docs/clase_10/capturas/compra_parcial.png)
-![Error de recepción](docs/clase_10/capturas/error_recepcion.png)
-![MySQL](docs/clase_10/capturas/mysql_compra.png)
-![PDF orden de compra](docs/clase_10/capturas/pdf_orden.png)
-![PDF factura](docs/clase_10/capturas/pdf_factura.png)
-![Dashboard](docs/clase_10/capturas/dashboard_compras.png)
- 
-## 13. Tecnologías utilizadas
- 
-- Laravel
-- Laravel Sail
-- Docker
-- MySQL
-- Blade
-- Bootstrap/Tailwind
-- Laravel Breeze (autenticación)
-- Spatie Laravel Permission (roles y permisos)
-- DomPDF (barryvdh/laravel-dompdf, reportes PDF)
-- Git
+## 9. Documentación y evidencias
+
+- [`docs/avance2/`](docs/avance2/) – documento PDF del avance y capturas del segundo corte
+- [`docs/analisis.md`](docs/analisis.md) – análisis del negocio
+- [`docs/diccionario.md`](docs/diccionario.md) – diccionario de datos
+- [`docs/diagrama_mer.jpeg`](docs/diagrama_mer.jpeg) – diagrama entidad-relación
+- [`docs/clase10/capturas/`](docs/clase10/capturas/) – capturas de compras, PDF y dashboard
+
+## 10. Comandos útiles
+
+```bash
+./vendor/bin/sail up -d                      # levantar contenedores
+./vendor/bin/sail down                       # apagar contenedores
+./vendor/bin/sail artisan migrate:fresh --seed   # reiniciar la base de datos
+./vendor/bin/sail artisan route:list         # ver rutas
+./vendor/bin/sail artisan tinker             # consola de Laravel
+./vendor/bin/sail artisan view:clear         # limpiar caché de vistas
+./vendor/bin/sail mysql                      # abrir MySQL (ver cambios de stock)
+./vendor/bin/sail test                       # ejecutar pruebas
+```
+
+## 11. Tecnologías
+
+Laravel 13 · PHP 8.3 · MySQL · Laravel Sail (Docker) · Blade · Tailwind CSS + Vite · Laravel Breeze · Spatie Laravel Permission · DomPDF (`barryvdh/laravel-dompdf`)
+

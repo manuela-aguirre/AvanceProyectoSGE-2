@@ -31,7 +31,7 @@
  <tbody>
  @foreach ($sale->details as $detail)
  <tr class="border-b">
- <td class="p-2">{{ $detail->product?->name }}</td>
+ <td class="p-2">{{ $detail->product?->nombre }}</td>
  <td class="p-2 text-right">{{ $detail->quantity }}</td>
  <td class="p-2 text-right">${{ number_format((float) $detail->unit_price, 2)
 }}</td>

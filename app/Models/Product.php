@@ -24,11 +24,11 @@ class Product extends Model
 
     // Relación: Producto pertenece a una Proveedor
     public function proveedor()
-    {
-        return $this->belongsTo(Proveedor::class, 'proveedor_id')->withDefault([
-            'nombre' => 'Sin proveedor',
-        ]);
-    }
+{
+    return $this->belongsTo(Provider::class, 'proveedor_id')->withDefault([
+        'name' => 'Sin proveedor',
+    ]);
+}
 
     // Relación: Producto pertenece a un Categoría
     public function category()

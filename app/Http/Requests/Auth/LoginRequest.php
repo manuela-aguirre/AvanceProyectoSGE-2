@@ -34,6 +34,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
+        /**
      * Attempt to authenticate the request's credentials.
      *
      * @throws ValidationException
@@ -47,6 +48,15 @@ class LoginRequest extends FormRequest
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
+            ]);
+        }
+
+        // Regla: un usuario desactivado no puede entrar aunque la contraseña sea correcta
+        if (! Auth::user()->active) {
+            Auth::guard('web')->logout();
+
+            throw ValidationException::withMessages([
+                'email' => 'Su usuario está inactivo. Contacte al administrador.',
             ]);
         }
 

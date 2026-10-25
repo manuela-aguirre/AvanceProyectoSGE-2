@@ -5,23 +5,29 @@ use Illuminate\Database\Seeder;
 class TestUserSeeder extends Seeder
 {
  /**
- * Usuarios de prueba (contraseña: password), uno por rol.
+ * Usuarios de prueba (contraseña: password).
  */
  public function run(): void
  {
  $users = [
- 'admin' => ['name' => 'Administrador', 'email' => 'admin@test.com'],
- 'vendedor' => ['name' => 'Vendedor', 'email' => 'vendedor@test.com'],
- 'almacenista' => ['name' => 'Almacenista', 'email' => 'almacenista@test.com'],
+ ['name' => 'Administrador', 'email' => 'admin@test.com', 'roles' => ['admin'], 'direct' => []],
+ ['name' => 'Vendedor', 'email' => 'vendedor@test.com', 'roles' => ['vendedor'], 'direct' =>
+[]],
+ ['name' => 'Almacenista', 'email' => 'almacenista@test.com', 'roles' => ['almacenista'],
+'direct' => []],
+ // Guía adicional: usuario con DOS roles y un permiso DIRECTO (no viene de ningún rol)
+ ['name' => 'Supervisor', 'email' => 'supervisor@test.com', 'roles' => ['vendedor',
+'almacenista'], 'direct' => ['ver-reportes']],
  ];
- foreach ($users as $role => $data) {
+ foreach ($users as $data) {
  $user = User::firstOrCreate(['email' => $data['email']], [
  'name' => $data['name'],
  'password' => 'password',
  ]);
  // La ruta /dashboard exige el middleware "verified"
  $user->forceFill(['email_verified_at' => $user->email_verified_at ?? now()])->save();
- $user->syncRoles([$role]);
+ $user->syncRoles($data['roles']);
+ $user->syncPermissions($data['direct']);
  }
  }
 }

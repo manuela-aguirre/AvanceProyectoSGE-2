@@ -13,10 +13,11 @@ return new class extends Migration
             $table->string('nombre', 150);
             $table->text('descripcion')->nullable();
             $table->string('imagen_url', 255)->nullable();
-            $table->integer('stock')->default(0);
-            $table->string('codigo', 20)->nullable();
-            $table->foreignId('proveedor_id')->constrained('proveedores')->onDelete('cascade');
-            $table->foreignId('categoria_id')->constrained('categorias')->onDelete('cascade');
+           $table->integer('stock')->default(0);
+$table->decimal('precio', 12, 2)->nullable();
+$table->string('codigo', 20)->nullable();
+$table->foreignId('proveedor_id')->constrained('providers')->restrictOnDelete();
+$table->foreignId('categoria_id')->constrained('categorias')->onDelete('cascade');
             $table->timestamps();
         });
     }

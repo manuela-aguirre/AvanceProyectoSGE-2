@@ -56,6 +56,12 @@ ventas.',
  'route' => 'purchases.index',
  'permission' => 'ver-compras',
  ],
+ [
+ 'title' => 'Configuración',
+ 'description' => 'Usuarios, roles y permisos.',
+ 'route' => 'settings.index',
+ 'permission' => 'ver-usuarios',
+ ],
  ])->filter(fn ($m) => $user->can($m['permission']))->values();
  $stats = collect();
  if ($user->can('ver-productos')) {
@@ -131,6 +137,7 @@ ventas.',
  return view('dashboard', [
  'user' => $user,
  'roles' => $user->getRoleNames(),
+ 'activeRole' => $user->activeRole()?->name,
  'modules' => $modules,
  'stats' => $stats,
  'topProducts' => $topProducts,

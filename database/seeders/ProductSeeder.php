@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Proveedor;
+use App\Models\Provider;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +13,7 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $proveedores = Proveedor::pluck('id', 'nombre');
+        $proveedores = Provider::pluck('id', 'name');
         $categorias = Category::pluck('id', 'nombre');
 
         $productos = [

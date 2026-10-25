@@ -4,7 +4,7 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Proveedor;
+use App\Models\Provider;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -49,7 +49,7 @@ $query->where('nombre', 'like', '%'.$request->string('search').'%')
  return view('products.create', [
  'product' => new Product(['stock' => 0]),
  'categories' => $this->selectableCategories(),
- 'proveedores' => Proveedor::orderBy('nombre')->get(),
+ 'proveedores' => Provider::orderBy('name')->get(),
  ]);
  }
  public function store(StoreProductRequest $request)
@@ -63,7 +63,7 @@ $query->where('nombre', 'like', '%'.$request->string('search').'%')
  return view('products.edit', [
  'product' => $product,
  'categories' => $this->selectableCategories(),
- 'proveedores' => Proveedor::orderBy('nombre')->get(),
+ 'proveedores' => Provider::orderBy('name')->get(),
  ]);
  }
  public function update(UpdateProductRequest $request, Product $product)
@@ -77,16 +77,16 @@ $query->where('nombre', 'like', '%'.$request->string('search').'%')
  {
  $product->delete();
  return redirect()->route('products.index')
- ->with('success', "Producto «{$product->name}» enviado a la papelera.");
+ ->with('success', "Producto «{$product->nombre}» enviado a la papelera.");
  }
  public function restore(Product $product)
  {
  if ($product->category?->trashed()) {
- return back()->with('error', "Restaura primero la categoría «{$product->category->name}».");
+ return back()->with('error', "Restaura primero la categoría «{$product->category->nombre}».");
  }
  $product->restore();
  return redirect()->route('products.index', ['trashed' => 1])
- ->with('success', "Producto «{$product->name}» restaurado.");
+ ->with('success', "Producto «{$product->nombre}» restaurado.");
  }
  // Solo las categorías activas se pueden asignar a un producto
  private function selectableCategories()

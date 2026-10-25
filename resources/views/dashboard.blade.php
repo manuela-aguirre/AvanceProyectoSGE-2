@@ -11,7 +11,32 @@
  <p class="text-sm text-gray-600">
  <strong>Roles asignados:</strong>
  {{ $roles->isEmpty() ? 'Sin rol asignado' : $roles->join(', ') }}
+ @if ($roles->count() > 1)
+ · <strong>Rol activo:</strong> {{ $activeRole }}
+ (<a href="{{ route('active-role.edit') }}" class="text-blue-700
+underline">cambiar</a>)
+ @endif
  </p>
+ </div>
+ {{-- Accesos rápidos (cada botón aparece solo si el usuario tiene el permiso) --}}
+ <div class="flex flex-wrap gap-2">
+ @can('crear-productos')
+ <a href="{{ route('products.create') }}" class="rounded-md bg-teal-700 px-3 py-2 textsm font-medium text-white shadow-sm hover:bg-teal-800">+ Nuevo producto</a>
+ @endcan
+ @can('crear-categorias')
+ <a href="{{ route('categories.create') }}" class="rounded-md border border-gray-300
+bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">+ Nueva
+categoría</a>
+ @endcan
+ @can('crear-ventas')
+ <a href="{{ route('sales.create') }}" class="rounded-md border border-gray-300 bgwhite px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">+ Nueva
+venta</a>
+ @endcan
+ @can('crear-compras')
+ <a href="{{ route('purchases.create') }}" class="rounded-md border border-gray-300
+bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">+ Nueva
+orden de compra</a>
+@endcan
  </div>
  {{-- KPIs --}}
  @if ($stats->isNotEmpty())
@@ -78,17 +103,21 @@ underline">+ Crear orden de compra</a>
  @endif
  </div>
  {{-- Módulos --}}
- @if ($modules->isNotEmpty())
  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
- @foreach ($modules as $module)
+ @forelse ($modules as $module)
  <a href="{{ route($module['route']) }}"
  class="bg-white shadow rounded p-6 hover:shadow-lg transition">
  <h3 class="font-semibold text-lg text-blue-700">{{ $module['title'] }}</h3>
  <p class="text-sm text-gray-600 mt-2">{{ $module['description'] }}</p>
  </a>
- @endforeach
+ @empty
+ <div class="col-span-full rounded-md border border-dashed border-gray-300 bgwhite p-8 text-center">
+ <p class="font-medium text-gray-900">No tienes módulos disponibles.</p>
+ <p class="mt-1 text-sm text-gray-600">Pide a un administrador que te asigne un
+rol.</p>
  </div>
- @endif
+ @endforelse
+ </div>
  </div>
  </div>
 </x-app-layout>
