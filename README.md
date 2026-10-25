@@ -22,7 +22,7 @@
 
 - Docker Desktop (con WSL2 si se trabaja en Windows)
 - Git
-- Composer y PHP 8.3 (opcional; ver el paso 2 si no se tienen)
+- Composer y PHP 8.3 (opcional)
 
 ## 3. Instalación desde cero
 
