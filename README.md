@@ -3,9 +3,6 @@
 **Asignatura:** Software de Gestión Empresarial – COTECNOVA 2026
 **Empresa:** Lyra
 **Integrantes:** Manuela Aguirre - Alejandra Díaz
-**Entrega:** Segundo corte – tag `avance-2`
-
-ERP web construido con Laravel para gestionar inventario, clientes, ventas, proveedores y compras, con control de acceso por roles y permisos, dashboard de indicadores y documentos PDF.
 
 ---
 
